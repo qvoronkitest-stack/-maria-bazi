@@ -1,6 +1,647 @@
-const kwEl=document.getElementById('rkw');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazi — Узнай свою природу</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --em1: #2E7055;
+    --em2: #235C44;
+    --em3: #1A4A36;
+    --gold: #D4A843;
+    --gold2: #EFC96A;
+    --gold3: #F8E4A0;
+    --cream: #FDF5E0;
+    --soft: #D4C49A;
+    --white: #FFFFFF;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    min-height:100vh;
+    background: linear-gradient(145deg, #2E7055 0%, #1E5C42 35%, #163F2E 70%, #0F2E20 100%);
+    font-family:'EB Garamond',Georgia,serif;
+    color:var(--cream);
+    padding:35px 18px 60px;
+    position:relative;
+  }
+
+  /* Gold frame top/bottom */
+  body::before {
+    content:'';
+    position:fixed; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold2) 50%, var(--gold) 80%, transparent 100%);
+    z-index:100;
+  }
+  body::after {
+    content:'';
+    position:fixed; bottom:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold2) 50%, var(--gold) 80%, transparent 100%);
+    z-index:100;
+  }
+
+  .wrap { max-width:420px; margin:0 auto; }
+
+  /* Header */
+  .head { text-align:center; margin-bottom:28px; }
+
+  .orn {
+    color:var(--gold2);
+    font-size:20px;
+    letter-spacing:12px;
+    margin-bottom:16px;
+    text-shadow: 0 0 12px rgba(212,168,67,0.6);
+  }
+
+  h1 {
+    font-family:'Cormorant Garamond',serif;
+    font-weight:300;
+    font-size:52px;
+    letter-spacing:12px;
+    color:var(--gold2);
+    text-transform:uppercase;
+    margin-bottom:8px;
+    text-shadow: 0 2px 20px rgba(212,168,67,0.4);
+  }
+
+  .sub {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:17px;
+    color:var(--soft);
+    letter-spacing:2px;
+  }
+
+  /* Divider */
+  .div {
+    display:flex; align-items:center; gap:12px;
+    margin:22px 0;
+  }
+  .div::before,.div::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold2), transparent);
+  }
+  .div span { color:var(--gold2); font-size:12px; text-shadow:0 0 8px rgba(212,168,67,0.8); }
+
+  /* Card */
+  .card {
+    background: linear-gradient(135deg, rgba(46,112,85,0.6) 0%, rgba(26,74,54,0.8) 100%);
+    border:1px solid var(--gold);
+    border-radius:3px;
+    padding:32px 26px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,168,67,0.2);
+    position:relative;
+  }
+
+  /* Corner gems */
+  .card::before, .card::after {
+    content:'◆';
+    position:absolute;
+    color:var(--gold2);
+    font-size:10px;
+    text-shadow:0 0 8px rgba(212,168,67,0.8);
+  }
+  .card::before { top:-6px; left:16px; }
+  .card::after { bottom:-6px; right:16px; }
+
+  .intro {
+    font-style:italic;
+    font-size:16px;
+    color:var(--soft);
+    text-align:center;
+    line-height:1.75;
+    margin-bottom:26px;
+  }
+
+  .lbl {
+    display:block;
+    font-family:'Cormorant Garamond',serif;
+    font-size:11px;
+    letter-spacing:5px;
+    text-transform:uppercase;
+    color:var(--gold2);
+    margin-bottom:10px;
+    text-align:center;
+    text-shadow:0 0 8px rgba(212,168,67,0.4);
+  }
+
+  .slabels { display:flex; gap:8px; margin-bottom:6px; }
+  .slabels span {
+    flex:1; text-align:center;
+    font-size:10px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold); opacity:.7;
+  }
+
+  .sels { display:flex; gap:8px; margin-bottom:22px; }
+  .sels select {
+    flex:1;
+    background:rgba(0,0,0,0.35);
+    border:1px solid rgba(212,168,67,0.5);
+    border-radius:2px;
+    padding:13px 4px;
+    font-family:'EB Garamond',serif;
+    font-size:17px;
+    color:var(--cream);
+    outline:none;
+    cursor:pointer;
+    text-align:center;
+    text-align-last:center;
+    appearance:none;
+    -webkit-appearance:none;
+    transition:border-color .3s, box-shadow .3s;
+  }
+  .sels select:focus {
+    border-color:var(--gold2);
+    box-shadow:0 0 16px rgba(212,168,67,0.25);
+  }
+  .sels select option { background:#1A4A36; color:var(--cream); }
+
+  .btn {
+    width:100%; padding:16px;
+    background:linear-gradient(135deg, rgba(212,168,67,0.15), rgba(212,168,67,0.05));
+    border:1px solid var(--gold2);
+    color:var(--gold2);
+    font-family:'Cormorant Garamond',serif;
+    font-size:16px;
+    letter-spacing:6px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .35s;
+    text-shadow:0 0 10px rgba(212,168,67,0.3);
+    box-shadow:0 0 20px rgba(212,168,67,0.1);
+  }
+  .btn:hover {
+    background:linear-gradient(135deg, rgba(212,168,67,0.25), rgba(212,168,67,0.1));
+    box-shadow:0 0 30px rgba(212,168,67,0.3);
+    letter-spacing:7px;
+    color:var(--gold3);
+  }
+
+  .err { text-align:center; color:#f0a0a0; font-size:14px; margin-top:10px; font-style:italic; display:none; }
+  .err.on { display:block; }
+
+  /* RESULT */
+  .res { display:none; }
+  .res.on { display:block; animation:up .7s ease forwards; }
+
+  .rcard {
+    background:linear-gradient(135deg, rgba(46,112,85,0.6), rgba(26,74,54,0.85));
+    border:1px solid var(--gold);
+    border-radius:3px;
+    padding:36px 26px;
+    text-align:center;
+    position:relative;
+    box-shadow:0 0 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,168,67,0.15);
+  }
+
+  .rcard::before {
+    content:'';
+    position:absolute; top:0;left:0;right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold2), var(--gold3), var(--gold2), transparent);
+  }
+  .rcard::after {
+    content:'';
+    position:absolute; bottom:0;left:0;right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold2), var(--gold3), var(--gold2), transparent);
+  }
+
+  .rdate {
+    font-size:11px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold2); opacity:.75; margin-bottom:20px;
+  }
+
+  .char {
+    font-size:96px; line-height:1; display:block; margin-bottom:8px;
+    filter:drop-shadow(0 0 16px rgba(212,168,67,0.5));
+    animation:glow 3s ease infinite;
+  }
+
+  .sname {
+    font-size:11px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold2); opacity:.8; margin-bottom:16px;
+    text-shadow:0 0 8px rgba(212,168,67,0.3);
+  }
+
+  .el {
+    font-family:'Cormorant Garamond',serif;
+    font-size:42px; font-weight:600; letter-spacing:5px;
+    color:var(--gold2); text-transform:uppercase; margin-bottom:3px;
+    text-shadow:0 2px 20px rgba(212,168,67,0.5);
+  }
+
+  .pol {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:20px;
+    color:var(--soft); margin-bottom:22px;
+    letter-spacing:2px;
+  }
+
+  .on-branch {
+    font-family:'Cormorant Garamond',serif;
+    font-size:15px; letter-spacing:2px;
+    color:var(--gold3); opacity:.85;
+    margin-bottom:20px;
+    font-style:italic;
+  }
+
+  .rline {
+    width:60px; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold2),transparent);
+    margin:0 auto 20px;
+  }
+
+  .desc {
+    font-size:17px; line-height:1.85;
+    color:var(--cream); margin-bottom:22px;
+    opacity:.92;
+  }
+
+  /* Clickable keywords */
+  .kws { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:26px; }
+
+  .kw {
+    padding:6px 16px;
+    border:1px solid var(--gold);
+    font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--gold2);
+    cursor:pointer;
+    transition:all .25s;
+    position:relative;
+    background:rgba(212,168,67,0.05);
+    text-shadow:0 0 6px rgba(212,168,67,0.2);
+  }
+  .kw:hover {
+    background:rgba(212,168,67,0.15);
+    color:var(--gold3);
+    box-shadow:0 0 12px rgba(212,168,67,0.25);
+  }
+  .kw.active {
+    background:rgba(212,168,67,0.2);
+    color:var(--gold3);
+    border-color:var(--gold2);
+    box-shadow:0 0 16px rgba(212,168,67,0.3);
+  }
+
+  .kw-tooltip {
+    display:none;
+    width:100%;
+    margin-top:10px;
+    padding:14px 16px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(212,168,67,0.25);
+    border-radius:2px;
+    font-size:15px;
+    line-height:1.7;
+    color:var(--soft);
+    font-style:italic;
+    text-align:left;
+    animation:fadeIn .3s ease;
+  }
+  .kw-tooltip.on { display:block; }
+
+  .cta {
+    border-top:1px solid rgba(212,168,67,0.2);
+    padding-top:22px;
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:17px;
+    color:var(--soft); line-height:1.8;
+  }
+  .cta strong {
+    color:var(--gold2); font-style:normal; display:block;
+    margin-top:8px; font-size:19px;
+    text-shadow:0 0 10px rgba(212,168,67,0.3);
+  }
+
+  .cta-sub {
+    display:block; margin-top:8px;
+    font-style:italic; font-size:16px;
+    color:var(--soft); opacity:.8;
+  }
+
+  .cta-btn {
+    width:100%; margin-top:20px; padding:18px;
+    background:linear-gradient(135deg, rgba(212,168,67,0.2), rgba(212,168,67,0.08));
+    border:1px solid var(--gold2);
+    color:var(--gold2);
+    font-family:'Cormorant Garamond',serif;
+    font-size:18px; letter-spacing:4px; text-transform:uppercase;
+    cursor:pointer; transition:all .35s;
+    text-shadow:0 0 10px rgba(212,168,67,0.3);
+    box-shadow:0 0 25px rgba(212,168,67,0.15);
+  }
+  .cta-btn:hover {
+    background:linear-gradient(135deg, rgba(212,168,67,0.3), rgba(212,168,67,0.15));
+    box-shadow:0 0 35px rgba(212,168,67,0.35);
+    color:var(--gold3);
+    letter-spacing:5px;
+  }
+
+  /* Questions */
+  .q-divider {
+    width:100%; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:24px 0;
+    opacity:.4;
+  }
+
+  .q-block { animation:fadeIn .5s ease forwards; }
+
+  .q-text {
+    font-family:'Cormorant Garamond',serif;
+    font-size:18px; line-height:1.7;
+    color:var(--gold-light);
+    text-align:center;
+    margin-bottom:16px;
+    font-style:italic;
+  }
+
+  .q-options { display:flex; flex-direction:column; gap:10px; margin-bottom:8px; }
+
+  .q-btn {
+    width:100%; padding:14px 16px;
+    background:rgba(212,168,67,0.05);
+    border:1px solid rgba(212,168,67,0.3);
+    color:var(--cream);
+    font-family:'EB Garamond',serif;
+    font-size:16px;
+    cursor:pointer;
+    transition:all .25s;
+    text-align:left;
+    border-radius:2px;
+    line-height:1.4;
+  }
+  .q-btn:hover {
+    background:rgba(212,168,67,0.15);
+    border-color:var(--gold2);
+    color:var(--gold3);
+  }
+  .q-btn.selected {
+    background:rgba(212,168,67,0.2);
+    border-color:var(--gold2);
+    color:var(--gold2);
+  }
+
+  .q-final-text {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:18px;
+    color:var(--soft); line-height:1.8;
+    text-align:center;
+    margin-bottom:20px;
+    padding:20px;
+    border:1px solid rgba(212,168,67,0.2);
+    background:rgba(0,0,0,0.2);
+  }
+
+  .rbtn {
+    display:block; margin:18px auto 0;
+    background:none; border:none;
+    color:var(--gold); opacity:.5;
+    font-family:'Cormorant Garamond',serif;
+    font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    cursor:pointer; transition:opacity .3s;
+  }
+  .rbtn:hover { opacity:.9; }
+
+  .foot {
+    margin-top:36px; text-align:center;
+    font-size:10px; letter-spacing:5px; text-transform:uppercase;
+    color:var(--gold2); opacity:.35;
+  }
+
+  @keyframes up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes glow {
+    0%,100%{filter:drop-shadow(0 0 10px rgba(212,168,67,0.4))}
+    50%{filter:drop-shadow(0 0 28px rgba(212,168,67,0.8))}
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="orn">✦ ✦ ✦</div>
+    <h1>Bazi</h1>
+    <div class="sub">Математика вашей природы</div>
+  </div>
+
+  <div class="div"><span>◆</span></div>
+
+  <!-- Form -->
+  <div class="card" id="fc">
+    <p class="intro">Выберите дату рождения — узнайте дневного мастера и основу вашей природы</p>
+    <label class="lbl">Дата рождения</label>
+    <div class="slabels"><span>День</span><span>Месяц</span><span>Год</span></div>
+    <div class="sels">
+      <select id="sd"></select>
+      <select id="sm"></select>
+      <select id="sy"></select>
+    </div>
+    <button class="btn" onclick="calc()">Раскрыть природу</button>
+    <div class="err" id="er">Пожалуйста, выберите дату рождения</div>
+  </div>
+
+  <!-- Result -->
+  <div class="res" id="res">
+    <div class="rcard">
+      <div class="rdate" id="rd"></div>
+      <span class="char" id="rc"></span>
+      <div class="sname" id="rs"></div>
+      <div class="el" id="re"></div>
+      <div class="pol" id="rp"></div>
+      <div class="on-branch" id="rob"></div>
+      <div class="rline"></div>
+      <p class="desc" id="rdesc"></p>
+      <div class="kws" id="rkw"></div>
+      <div class="kw-tooltip" id="ktt"></div>
+      <!-- Questions funnel -->
+      <div class="questions" id="questions">
+        <div class="q-divider"></div>
+
+        <!-- Q1 -->
+        <div class="q-block" id="q1">
+          <p class="q-text">Насколько точно это описание отражает вас?</p>
+          <div class="q-options">
+            <button class="q-btn" onclick="answerQ1(this)">Да, это прямо про меня</button>
+            <button class="q-btn" onclick="answerQ1(this)">В целом похоже</button>
+            <button class="q-btn" onclick="answerQ1(this)">Частично</button>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="q-block" id="q2" style="display:none">
+          <p class="q-text">Где вы сейчас хотите изменений быстрее всего?</p>
+          <div class="q-options">
+            <button class="q-btn" onclick="answerQ2(this)">💰 В деньгах и карьере</button>
+            <button class="q-btn" onclick="answerQ2(this)">❤️ В отношениях</button>
+            <button class="q-btn" onclick="answerQ2(this)">🌿 В понимании своего пути</button>
+            <button class="q-btn" onclick="answerQ2(this)">⚡ Во всём сразу</button>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="q-block" id="q3" style="display:none">
+          <p class="q-text">Как давно эта ситуация в вашей жизни?</p>
+          <div class="q-options">
+            <button class="q-btn" onclick="answerQ3(this)">Недавно — только заметила</button>
+            <button class="q-btn" onclick="answerQ3(this)">Уже больше года</button>
+            <button class="q-btn" onclick="answerQ3(this)">Несколько лет — и пора наконец разобраться</button>
+          </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="q-block" id="qfinal" style="display:none">
+          <p class="q-final-text">За каждым из этих ответов стоит что-то конкретное в вашей карте. Это можно увидеть и разобрать.</p>
+          <button class="cta-btn" onclick="window.open('https://ig.me/m/maria_pantazeva','_blank')">Хочу разобрать</button>
+        </div>
+      </div>
+    </div>
+    <button class="rbtn" onclick="rst()">← Другая дата</button>
+  </div>
+
+  <div class="foot">Bazi · Китайская метафизика</div>
+</div>
+
+<script>
+const sd=document.getElementById('sd'),sm=document.getElementById('sm'),sy=document.getElementById('sy');
+const mn=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const mnG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+sd.innerHTML='<option value="">—</option>'+Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+sm.innerHTML='<option value="">—</option>'+mn.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+const cy=new Date().getFullYear();
+sy.innerHTML='<option value="">—</option>'+Array.from({length:cy-1919},(_,i)=>`<option value="${cy-10-i}">${cy-10-i}</option>`).join('');
+
+const branches=[
+  {name:'Крыса',char:'子',element:'Вода Ян'},
+  {name:'Бык',char:'丑',element:'Земля Инь'},
+  {name:'Тигр',char:'寅',element:'Дерево Ян'},
+  {name:'Кролик',char:'卯',element:'Дерево Инь'},
+  {name:'Дракон',char:'辰',element:'Земля Ян'},
+  {name:'Змея',char:'巳',element:'Огонь Инь'},
+  {name:'Лошадь',char:'午',element:'Огонь Ян'},
+  {name:'Коза',char:'未',element:'Земля Инь'},
+  {name:'Обезьяна',char:'申',element:'Металл Ян'},
+  {name:'Петух',char:'酉',element:'Металл Инь'},
+  {name:'Собака',char:'戌',element:'Земля Ян'},
+  {name:'Свинья',char:'亥',element:'Вода Инь'}
+];
+
+const stems=[
+  {char:'甲',name:'Цзя',element:'Дерево',polarity:'Ян',
+   description:'Дерево Ян — сила первого роста. Вы прямолинейны, целеустремлённы и рождены вести за собой. Ваша природа — пробиваться вверх, несмотря на препятствия. Вы видите цель там, где другие видят стену.',
+   keywords:[
+     {w:'Рост',t:'Ваша природа — всегда двигаться вперёд. Вы не умеете стоять на месте.'},
+     {w:'Лидерство',t:'Люди следуют за вами — часто даже без вашей просьбы.'},
+     {w:'Движение',t:'Статика вас угнетает. Ваша энергия — в действии и направлении.'},
+     {w:'Сила воли',t:'Вы способны держаться курса там, где другие давно сдались.'}
+   ]},
+  {char:'乙',name:'И',element:'Дерево',polarity:'Инь',
+   description:'Дерево Инь — гибкость и изящество. Вы умеете находить путь там, где нет дороги. Не напором, а мудростью. Ваша сила в адаптивности и умении создавать красоту вокруг.',
+   keywords:[
+     {w:'Гибкость',t:'Там где другие ломаются — вы гнётесь и находите обходной путь.'},
+     {w:'Красота',t:'Вы создаёте гармонию вокруг себя — в пространстве, словах, отношениях.'},
+     {w:'Дипломатия',t:'Вы умеете договариваться так, что все остаются довольны.'},
+     {w:'Интуиция',t:'Вы чувствуете людей и ситуации раньше чем успеваете их обдумать.'}
+   ]},
+  {char:'丙',name:'Бин',element:'Огонь',polarity:'Ян',
+   description:'Огонь Ян — вы как солнце. Согреваете всех вокруг одним своим присутствием. Харизма, энергия, способность вдохновлять — ваши природные дары. Люди тянутся к вам.',
+   keywords:[
+     {w:'Харизма',t:'Вы входите в комнату — и что-то меняется. Это не маска. Это ваша природа.'},
+     {w:'Влияние',t:'Ваши слова и поступки оставляют след в людях надолго.'},
+     {w:'Энергия',t:'Вы заряжаете окружающих — даже когда сами устали.'},
+     {w:'Проявленность',t:'Ваша природа требует быть видимой. Тень — не ваше место.'}
+   ]},
+  {char:'丁',name:'Дин',element:'Огонь',polarity:'Инь',
+   description:'Огонь Инь — вы как свеча. Тихий тёплый свет в темноте. Ваша сила в глубине и тонкости. Вы видите суть людей и ситуаций там, где другие видят поверхность.',
+   keywords:[
+     {w:'Глубина',t:'Вы не умеете быть поверхностным — ни в чём. Это ваша сила.'},
+     {w:'Тепло',t:'Люди чувствуют себя рядом с вами в безопасности. Вы создаёте уют.'},
+     {w:'Проницательность',t:'Вы видите людей насквозь — часто с первого взгляда.'},
+     {w:'Творчество',t:'Ваше воображение — неиссякаемый ресурс.'}
+   ]},
+  {char:'戊',name:'У',element:'Земля',polarity:'Ян',
+   description:'Земля Ян — вы гора. Надёжность, стабильность, защита. Люди приходят к вам за опорой. Ваша природа — создавать фундамент для других и строить что-то долговечное.',
+   keywords:[
+     {w:'Надёжность',t:'На вас можно положиться. Всегда. Это знают все кто вас знает.'},
+     {w:'Защита',t:'Вы инстинктивно встаёте на защиту тех кто рядом.'},
+     {w:'Стабильность',t:'Вы — якорь. В хаосе вокруг вас люди находят почву под ногами.'},
+     {w:'Сила',t:'Ваша сила не в громкости. В устойчивости. Вас не сдвинуть.'}
+   ]},
+  {char:'己',name:'Цзи',element:'Земля',polarity:'Инь',
+   description:'Земля Инь — вы плодородная почва. Питаете всё что рядом. Ваша сила в заботе и умении взращивать. Вы создаёте условия для роста других — и себя.',
+   keywords:[
+     {w:'Забота',t:'Вы замечаете нужды других раньше чем они успевают их назвать.'},
+     {w:'Питание',t:'Рядом с вами люди расцветают. Вы умеете взращивать таланты.'},
+     {w:'Терпение',t:'Вы понимаете что хорошее требует времени. И умеете ждать.'},
+     {w:'Мудрость',t:'Ваша мудрость приходит через опыт и наблюдение. Она настоящая.'}
+   ]},
+  {char:'庚',name:'Гэн',element:'Металл',polarity:'Ян',
+   description:'Металл Ян — вы меч. Прямота, решительность, непримиримость к неправде. Ваша природа — резать лишнее и оставлять только суть. Вы не терпите фальши.',
+   keywords:[
+     {w:'Решительность',t:'Вы умеете принимать решения там, где другие застывают в сомнениях.'},
+     {w:'Справедливость',t:'Несправедливость для вас — физически невыносима. Вы не можете пройти мимо.'},
+     {w:'Точность',t:'Вы мыслите чётко, говорите прямо и не терпите размытости.'},
+     {w:'Сила духа',t:'Вы не ломаетесь под давлением. Давление вас закаляет.'}
+   ]},
+  {char:'辛',name:'Синь',element:'Металл',polarity:'Инь',
+   description:'Металл Инь — вы драгоценность. Изысканность, качество, совершенство в деталях. Ваша природа — сиять. Деньги и признание приходят через вашу уникальность и образ.',
+   keywords:[
+     {w:'Изысканность',t:'Вы чувствуете разницу между хорошим и превосходным. И не соглашаетесь на меньшее.'},
+     {w:'Качество',t:'Вы делаете всё либо идеально, либо никак. Средний результат вас не устраивает.'},
+     {w:'Образ',t:'Ваш образ — это ваш капитал. Деньги приходят через вашу видимость и репутацию.'},
+     {w:'Совершенство',t:'Вы замечаете детали которые другие не видят. Именно они делают вас уникальной.'}
+   ]},
+  {char:'壬',name:'Жэнь',element:'Вода',polarity:'Ян',
+   description:'Вода Ян — вы океан. Глубина, сила, неостановимость. Ваш ум стратегичен и видит далеко. Вы рождены для масштаба — ваши идеи и решения меняют многое.',
+   keywords:[
+     {w:'Стратегия',t:'Вы мыслите на несколько ходов вперёд. Это ваше природное преимущество.'},
+     {w:'Масштаб',t:'Маленькие цели вас не вдохновляют. Вам нужен простор для движения.'},
+     {w:'Глубина',t:'Вы не способны оставаться на поверхности. Вам нужно понимать суть.'},
+     {w:'Сила мысли',t:'Ваш главный ресурс — интеллект. Именно он открывает двери.'}
+   ]},
+  {char:'癸',name:'Гуй',element:'Вода',polarity:'Инь',
+   description:'Вода Инь — вы родник. Тихий, чистый, питающий. Ваша мудрость приходит изнутри. Вы чувствуете людей и ситуации на уровне недоступном другим. Это ваш главный дар.',
+   keywords:[
+     {w:'Мудрость',t:'Ваши ответы часто удивляют даже вас — они приходят из глубины которую сложно объяснить.'},
+     {w:'Чувствительность',t:'Вы воспринимаете мир тонко. Это дар — и иногда нагрузка.'},
+     {w:'Интуиция',t:'Вы знаете — просто знаете. Без доказательств. И почти всегда правы.'},
+     {w:'Глубина',t:'Вас не устраивают простые ответы. Вы всегда ищете что-то большее.'}
+   ]}
+];
+
+function getDayBranch(year, month, day) {
+  const d = new Date(year, month-1, day, 12);
+  const ref = new Date(1900, 0, 1, 12); // Jan 1 1900 = 甲戌 (position 10 in branch cycle)
+  const days = Math.round((d - ref) / 86400000);
+  return branches[((days + 10) % 12 + 12) % 12];
+}
+
+function calc(){
+  const d=parseInt(sd.value), m=parseInt(sm.value), y=parseInt(sy.value);
+  const er=document.getElementById('er');
+  if(!d||!m||!y){er.classList.add('on');return;}
+  er.classList.remove('on');
+
+  const birth=new Date(y,m-1,d,12), ref=new Date(1900,0,1,12);
+  const days=Math.round((birth-ref)/86400000);
+  const s=stems[((days%10)+10)%10];
+  const branch=getDayBranch(y,m,d);
+
+  document.getElementById('rd').textContent=`${d} ${mnG[m-1]} ${y}`;
+  document.getElementById('rc').textContent=s.char;
+  document.getElementById('rs').textContent=`Небесный ствол · ${s.name}`;
+  document.getElementById('re').textContent=s.element;
+  document.getElementById('rp').textContent=s.polarity;
+  document.getElementById('rob').textContent=`на ${branch.name} ${branch.char} · ${branch.element}`;
+  document.getElementById('rdesc').textContent=s.description;
+
+  const kwEl=document.getElementById('rkw');
   kwEl.innerHTML=s.keywords.map((k,i)=>
-    <span class="kw" onclick="showTip(${i})" id="kw${i}">${k.w}</span>
+    `<span class="kw" onclick="showTip(${i})" id="kw${i}">${k.w}</span>`
   ).join('');
 
   window._kwData=s.keywords;
