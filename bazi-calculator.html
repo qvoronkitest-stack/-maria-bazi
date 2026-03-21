@@ -1,0 +1,68 @@
+const kwEl=document.getElementById('rkw');
+  kwEl.innerHTML=s.keywords.map((k,i)=>
+    <span class="kw" onclick="showTip(${i})" id="kw${i}">${k.w}</span>
+  ).join('');
+
+  window._kwData=s.keywords;
+  document.getElementById('ktt').classList.remove('on');
+  document.getElementById('ktt').textContent='';
+
+  document.getElementById('fc').style.display='none';
+  const r=document.getElementById('res');
+  r.classList.remove('on'); void r.offsetWidth; r.classList.add('on');
+}
+
+function answerQ1(btn){
+  document.querySelectorAll('#q1 .q-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(()=>{
+    document.getElementById('q1').style.opacity='0.5';
+    document.getElementById('q2').style.display='block';
+  }, 400);
+}
+
+function answerQ2(btn){
+  document.querySelectorAll('#q2 .q-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(()=>{
+    document.getElementById('q2').style.opacity='0.5';
+    document.getElementById('q3').style.display='block';
+  }, 400);
+}
+
+function answerQ3(btn){
+  document.querySelectorAll('#q3 .q-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(()=>{
+    document.getElementById('q3').style.opacity='0.5';
+    document.getElementById('qfinal').style.display='block';
+  }, 400);
+}
+
+function showTip(i){
+  const tt=document.getElementById('ktt');
+  const kws=document.querySelectorAll('.kw');
+  const activeKw=document.getElementById('kw'+i);
+
+  if(activeKw.classList.contains('active')){
+    activeKw.classList.remove('active');
+    tt.classList.remove('on');
+    tt.textContent='';
+    return;
+  }
+
+  kws.forEach(k=>k.classList.remove('active'));
+  activeKw.classList.add('active');
+  tt.textContent=window._kwData[i].t;
+  tt.classList.remove('on'); void tt.offsetWidth; tt.classList.add('on');
+}
+
+function rst(){
+  document.getElementById('fc').style.display='block';
+  document.getElementById('res').classList.remove('on');
+  sd.value=''; sm.value=''; sy.value='';
+  document.getElementById('ktt').classList.remove('on');
+}
+</script>
+</body>
+</html>
